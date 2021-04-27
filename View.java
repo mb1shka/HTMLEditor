@@ -43,7 +43,19 @@ public class View extends JFrame implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        //вызывается при выборе пунктов меню, у которых наше представление
+        //указано в виде слушателя событий
+        String line = e.getActionCommand(); //получаем команду
+        //по этой строке можно понять, какой пункт меню создал данное событие
 
+        switch (line) {
+            case "Новый" -> controller.createNewDocument();
+            case "Открыть" -> controller.openDocument();
+            case "Сохранить" -> controller.saveDocument();
+            case "Сохранить как..." -> controller.saveDocumentAs();
+            case "Выход" -> controller.exit();
+            case "О программе" -> showAbout();
+        }
     }
 
     public void init() {
@@ -100,7 +112,14 @@ public class View extends JFrame implements ActionListener {
         controller.exit();
     }
 
-    public void selectedTabChanged() {}
+    public void selectedTabChanged() {
+        if (tabbedPane.getSelectedIndex() == 0) {
+            controller.setPlainText(plainTextPane.getText());
+        } else {
+            plainTextPane.setText(controller.getPlainText());
+        }
+        resetUndo();
+    }
 
     public boolean canUndo() {
         return undoManager.canUndo();
@@ -133,5 +152,22 @@ public class View extends JFrame implements ActionListener {
         } catch (CannotRedoException e) {
             ExceptionHandler.log(e);
         }
+    }
+
+    public boolean isHtmlTabSelected() {
+        return tabbedPane.getSelectedIndex() == 0;
+    }
+
+    public void selectHtmlTab() {
+        tabbedPane.setSelectedIndex(0);
+        resetUndo();
+    }
+
+    public void update() {
+        htmlTextPane.setDocument(controller.getDocument());
+    }
+
+    public void showAbout() {
+        JOptionPane.showMessageDialog(this, "Моя бессонная ночь", "О программе", JOptionPane.INFORMATION_MESSAGE);
     }
 }
